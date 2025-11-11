@@ -14,3 +14,4 @@ class Asset(Base):
     symbol = Column(String, unique=True, index=True)
     type = Column(String)
     price = Column(Float)
+git remote -v
