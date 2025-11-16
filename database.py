@@ -1,16 +1,32 @@
-from sqlalchemy import create_engine
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
+import sqlite3
 
-DATABASE_URL = "sqlite:///./crypto_tracker.db"
+def get_db_connection():
+    conn = sqlite3.connect('CryptoTracker.db')
+    conn.row_factory = sqlite3.Row
+    return conn
 
-engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-Base = declarative_base()
+def create_database():
+    conn = get_db_connection()
+    cursor = conn.cursor()
 
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS users (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            username TEXT NOT NULL
+            password TEXT NOT NULL
+        )
+    ''')
+
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS assets (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL
+            symbol TEXT NOT NULL
+            type TEXT NOT NULL
+            price TEXT NOT NULL
+        )
+    ''')
+    conn.commit()
+
+    return conn, cursor
+
